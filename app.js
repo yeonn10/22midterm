@@ -81,6 +81,7 @@
 
   function start(s, deck, label) {
     if (!deck.length) return toast('문제가 없습니다');
+    deck = deck.map(function (q) { return E.shuffleOptions(q); });   // 보기는 매번 새로 섞음(순서가 의미 있는 문항 제외)
     Q = { s: s, deck: deck, i: 0, ans: {}, pend: [], label: label };
     go('#/quiz');
   }

@@ -26,6 +26,40 @@
     return a;
   }
 
+
+  /* ---------- 보기 섞기 ---------- */
+  var PIN_RE = /^\s*(정답\s*없음|해당\s*없음|모두\s*(옳|맞|정답|해당|아니)|위의?\s*(보기\s*)?(모두|중\s*없)|all of the above|none of the above)/i;
+  var LABEL_RE = /^\s*[\(（]?([가-하]|[A-Ja-j])[\)）\.]?\s*$/;
+  var NUMTOK = /[-+−]?\d+(?:[.,]\d+)?/g;
+
+  /** 보기 순서가 의미를 갖는 문항(가·나·다, A·B·C, 연속 숫자, ①~⑤ 지칭, 해설이 번호를 언급)은 섞지 않는다 */
+  function isFixedOrder(q) {
+    var o = q.opts;
+    if (o.every(function (x) { return LABEL_RE.test(x); })) return true;
+    if (o.some(function (x) { return /[①-⑩]/.test(x); })) return true;
+    var allNum = o.every(function (x) { return /\d/.test(x); });
+    if (allNum) {
+      var shape = o.map(function (x) { return x.replace(NUMTOK, '#').replace(/\s+/g, ''); });
+      if (shape.every(function (t) { return t === shape[0]; })) return true;
+    }
+    if (/[①-⑩]|[1-9]\d{0,2}\s*번/.test(q.exp || '')) return true;
+    return false;
+  }
+
+  /** 보기를 섞은 새 문항을 돌려준다. '정답 없음/모두 옳다' 류는 맨 뒤에 고정. 원본은 건드리지 않는다 */
+  function shuffleOptions(q, rng) {
+    if (isFixedOrder(q) || q.opts.length < 2) return q;
+    var idx = q.opts.map(function (_, i) { return i; });
+    var free = idx.filter(function (i) { return !PIN_RE.test(q.opts[i]); });
+    var pinned = idx.filter(function (i) { return PIN_RE.test(q.opts[i]); });
+    var order = shuffle(free, rng).concat(pinned);   // order[newPos] = oldIndex
+    var copy = {};
+    for (var k in q) copy[k] = q[k];
+    copy.opts = order.map(function (i) { return q.opts[i]; });
+    copy.ans = q.ans.map(function (a) { return order.indexOf(a - 1) + 1; }).sort(function (x, y) { return x - y; });
+    return copy;
+  }
+
   /** 과목/유형/단원 필터로 문제 덱 만들기. 순서는 단원 → 유형 → 원래 순서 */
   function buildDeck(subject, opt) {
     opt = opt || {};
@@ -131,7 +165,7 @@
 
   return {
     CIRCLED: CIRCLED, BOOKMARK_KEY: BOOKMARK_KEY,
-    isCorrect: isCorrect, shuffle: shuffle, buildDeck: buildDeck, countUnits: countUnits, countKinds: countKinds,
+    isCorrect: isCorrect, shuffle: shuffle, isFixedOrder: isFixedOrder, shuffleOptions: shuffleOptions, buildDeck: buildDeck, countUnits: countUnits, countKinds: countKinds,
     makeStore: makeStore, sortIds: sortIds, formatExport: formatExport, parseImport: parseImport,
     mergeBookmarks: mergeBookmarks, summarize: summarize
   };
