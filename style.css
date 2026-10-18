@@ -46,3 +46,17 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
 .bmitem{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
 .bmitem code{color:var(--navy);font-weight:700;white-space:nowrap}.bmitem span{flex:1;font-size:14px}
 textarea{width:100%;min-height:90px;font:inherit}
+
+/* 그림이 있는 문제: 왼쪽 그림 / 오른쪽 보기 (넓은 화면), 좁은 화면에서는 위아래 */
+main.wide{max-width:1180px}
+.qgrid.withfig{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+.qgrid.withfig .figcol{position:sticky;top:8px}
+.qgrid.withfig .fig{margin:0}
+.fig img{display:block;width:100%;height:auto;margin:0 0 8px}
+.qgrid.withfig .fig img{width:auto;max-width:100%;max-height:calc(100vh - 290px);object-fit:contain;margin:0 auto 8px}
+.qgrid.withfig .qtext{font-size:16px}
+.qgrid.withfig .opt{padding:8px 10px;margin-bottom:6px}
+@media (max-width:719px){
+  .qgrid.withfig{display:block}
+  .qgrid.withfig .fig img{max-height:45vh}
+}

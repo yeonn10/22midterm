@@ -17,6 +17,7 @@
   /* ---------- 라우팅 ---------- */
   function go(h) { if (location.hash === h) route(); else location.hash = h; }
   function route() {
+    app.className = '';
     var h = location.hash || '#/';
     var m;
     if ((m = h.match(/^#\/s\/([^/]+)$/)) && byId[m[1]]) return setup(byId[m[1]]);
@@ -96,10 +97,12 @@
       '<div class="qhead"><span><span class="tag">' + esc(nameOf(Q.s, Q.s.kinds, q.kind)) + '</span> ' + esc(nameOf(Q.s, Q.s.units, q.unit)) + (q.topic ? ' · ' + esc(q.topic) : '') +
       '</span><span>' + (q.src ? esc(q.src) + ' · ' : '') + '<code>' + esc(q.id) + '</code> <button class="bm' + (store.has(q.id) ? ' on' : '') + '" id="bm" title="북마크 (9 추가 / 8 해제)">' + (store.has(q.id) ? '★' : '☆') + '</button></span></div>' +
       '<div class="qtext">' + esc(q.q) + (multi ? '  <span class="tag">모두 고르시오</span>' : '') + (q.gen ? ' <span class="badge">보기 재구성</span>' : '') + '</div>';
-    if (q.img !== undefined || q.imgNeeded) { /* 아래에서 처리 */ }
-    if (q.figs && q.figs.length) h += '<div class="fig">' + q.figs.map(function (f) { return '<img src="' + esc(f) + '" alt="문제 그림">'; }).join('') + '</div>';
-    else if (q.img) h += '<div class="fig" id="fig"></div>';
-    h += q.opts.map(function (o, i) {
+    var hasFig = !!((q.figs && q.figs.length) || q.img);
+    app.className = hasFig ? 'wide' : '';
+    h += '<div class="qgrid' + (hasFig ? ' withfig' : '') + '">';
+    if (q.figs && q.figs.length) h += '<div class="figcol"><div class="fig">' + q.figs.map(function (f) { return '<img src="' + esc(f) + '" alt="문제 그림">'; }).join('') + '</div></div>';
+    else if (q.img) h += '<div class="figcol"><div class="fig" id="fig"></div></div>';
+    h += '<div class="optcol">' + q.opts.map(function (o, i) {
       var no = i + 1, cls = '';
       if (done) { var isA = q.ans.indexOf(no) >= 0, isS = sel.indexOf(no) >= 0; cls = isA ? ' right' : (isS ? ' bad' : ''); }
       else if (sel.indexOf(no) >= 0) cls = ' sel';
@@ -111,7 +114,7 @@
       h += '<div class="banner ' + bn[0] + '">' + bn[1] + (a.correct ? '' : q.ans.map(function (x) { return E.CIRCLED[x - 1]; }).join(' ')) + '</div>';
       if (q.exp) h += '<div class="exp">' + esc(q.exp) + '</div>';
     }
-    h += '</div><div class="nav"><button id="prev"' + (Q.i ? '' : ' disabled') + '>← 이전</button>' +
+    h += '</div></div></div><div class="nav"><button id="prev"' + (Q.i ? '' : ' disabled') + '>← 이전</button>' +
       '<button id="dk"' + (done ? ' disabled' : '') + '>모름 (0)</button>' +
       '<button class="primary" id="next">' + (Q.i === Q.deck.length - 1 ? '결과 보기' : '다음 →') + '</button></div>' +
       '<div class="keys"><kbd>1</kbd>–<kbd>5</kbd> 선택 · <kbd>0</kbd> 모름 · <kbd>Enter</kbd>/<kbd>→</kbd>/<kbd>↓</kbd> 다음 · <kbd>←</kbd>/<kbd>↑</kbd> 이전 · <kbd>9</kbd> 북마크 추가 · <kbd>8</kbd> 북마크 해제' + ' · 번호로 고른 뒤 <kbd>Enter</kbd>로 정답 확인'+(multi ? ' (복수정답은 번호로 여러 개 선택)' : '') + '</div>';
