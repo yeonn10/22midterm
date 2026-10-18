@@ -6,6 +6,7 @@
   var subjects = DATA.subjects, byId = {}, qById = {}, order = new Map(), n = 0;
   subjects.forEach(function (s) { byId[s.id] = s; s.questions.forEach(function (q) { qById[q.id] = { q: q, s: s }; order.set(q.id, n++); }); });
   var validIds = new Set(order.keys());
+  var showHachi = false; // h 키로 하치와레 보이기/숨기기 (기본: 숨김)
   var Q = null; // 진행 중 퀴즈 상태
   var view = 'home';
 
@@ -101,7 +102,7 @@
       '<div class="qtext">' + esc(q.q) + (multi ? '  <span class="tag">모두 고르시오</span>' : '') + (q.gen ? ' <span class="badge">보기 재구성</span>' : '') + '</div>';
     var hasFig = !!((q.figs && q.figs.length) || q.img);
     app.className = hasFig ? 'wide' : '';
-    var mc = document.getElementById('mascot'); if (mc) mc.hidden = false;
+    var mc = document.getElementById('mascot'); if (mc) mc.hidden = !showHachi;
     h += '<div class="qgrid' + (hasFig ? ' withfig' : '') + '">';
     if (q.figs && q.figs.length) h += '<div class="figcol"><div class="fig">' + q.figs.map(function (f) { return '<img src="' + esc(f) + '" alt="문제 그림">'; }).join('') + '</div></div>';
     else if (q.img) h += '<div class="figcol"><div class="fig" id="fig"></div></div>';
@@ -180,6 +181,7 @@
     var k = e.key, handled = true;
     if (k >= '1' && k <= '5') pick(+k);
     else if (k === '0') dontKnow();
+    else if (k === 'h' || k === 'H') { showHachi = !showHachi; var mc2 = document.getElementById('mascot'); if (mc2) mc2.hidden = !showHachi; }
     else if (k === '9') { if (store.has(cur().id)) toggleBm('del'); else toast('북마크에 없는 문제입니다'); }
     else if (k === '8') toggleBm('add');
     else if (k === 'Enter') { if (Q.ans[cur().id]) move(1); else if (Q.pend.length) submit(); }
