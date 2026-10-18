@@ -99,7 +99,7 @@
       '<div class="bar"><i style="width:' + pct + '%"></i></div><div class="card">' +
       '<div class="qhead"><span><span class="tag">' + esc(nameOf(Q.s, Q.s.kinds, q.kind)) + '</span> ' + esc(nameOf(Q.s, Q.s.units, q.unit)) + (q.topic ? ' · ' + esc(q.topic) : '') +
       '</span><span>' + (q.src ? esc(q.src) + ' · ' : '') + '<code>' + esc(q.id) + '</code> <button class="bm' + (store.has(q.id) ? ' on' : '') + '" id="bm" title="북마크 (9 추가 / 8 해제)">' + (store.has(q.id) ? '★' : '☆') + '</button></span></div>' +
-      '<div class="qtext">' + esc(q.q) + (multi ? '  <span class="tag">모두 고르시오</span>' : '') + (q.gen ? ' <span class="badge">보기 재구성</span>' : '') + '</div>';
+      '<div class="qtext">' + esc(q.q) + (multi && !/모두\s*고르/.test(q.q) ? ' <span class="multi">(모두 고르시오)</span>' : '') + (q.gen ? ' <span class="badge">보기 재구성</span>' : '') + '</div>';
     var hasFig = !!((q.figs && q.figs.length) || q.img);
     app.className = hasFig ? 'wide' : '';
     var mc = document.getElementById('mascot'); if (mc) mc.hidden = !showHachi;
@@ -121,7 +121,7 @@
     h += '</div></div></div><div class="nav"><button id="prev"' + (Q.i ? '' : ' disabled') + '>← 이전</button>' +
       '<button id="dk"' + (done ? ' disabled' : '') + '>모름 (0)</button>' +
       '<button class="primary" id="next">' + (Q.i === Q.deck.length - 1 ? '결과 보기' : '다음 →') + '</button></div>' +
-      '<div class="keys"><kbd>1</kbd>–<kbd>5</kbd> 선택 · <kbd>0</kbd> 모름 · <kbd>→</kbd>/<kbd>↓</kbd> 다음(풀기 전에도 가능) · <kbd>Enter</kbd> 정답 확인 후 다음 · <kbd>←</kbd>/<kbd>↑</kbd> 이전 · <kbd>8</kbd> 북마크 추가 · <kbd>9</kbd> 북마크 해제' + ' · 번호로 고른 뒤 <kbd>Enter</kbd>로 정답 확인'+(multi ? ' (복수정답은 번호로 여러 개 선택)' : '') + '</div>';
+      '<div class="keys"><kbd>1</kbd>–<kbd>5</kbd> 선택 · <kbd>0</kbd> 모름 · <kbd>→</kbd>/<kbd>↓</kbd> 다음(풀기 전에도 가능) · <kbd>Enter</kbd> 정답 확인 후 다음 · <kbd>←</kbd>/<kbd>↑</kbd> 이전 · <kbd>B</kbd> 북마크 추가/해제' + ' · 번호로 고른 뒤 <kbd>Enter</kbd>로 정답 확인'+(multi ? ' (복수정답은 번호로 여러 개 선택)' : '') + '</div>';
     app.innerHTML = h;
     if (q.img && !(q.figs && q.figs.length)) drawFig(q);
     app.querySelectorAll('.opt').forEach(function (b) { b.onclick = function () { b.blur(); pick(+b.dataset.o); }; });
@@ -182,8 +182,7 @@
     if (k >= '1' && k <= '5') pick(+k);
     else if (k === '0') dontKnow();
     else if (k === 'h' || k === 'H' || k === 'ㅗ' || e.code === 'KeyH') { showHachi = !showHachi; var mc2 = document.getElementById('mascot'); if (mc2) mc2.hidden = !showHachi; }
-    else if (k === '9') { if (store.has(cur().id)) toggleBm('del'); else toast('북마크에 없는 문제입니다'); }
-    else if (k === '8') toggleBm('add');
+    else if (k === 'b' || k === 'B' || k === 'ㅠ' || e.code === 'KeyB') toggleBm();   // 북마크 있으면 해제, 없으면 추가
     else if (k === 'Enter') { if (Q.ans[cur().id]) move(1); else if (Q.pend.length) submit(); }
     else if (k === 'ArrowRight' || k === 'ArrowDown') move(1);
     else if (k === 'ArrowLeft' || k === 'ArrowUp') move(-1);

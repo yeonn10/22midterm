@@ -66,3 +66,6 @@ main.wide{max-width:1180px}
 #mascot[hidden]{display:none}
 main,.top,header{position:relative;z-index:1}
 @media (max-width:640px){#mascot{display:none}}
+
+.multi{font-weight:700;color:#c2410c;white-space:nowrap}
+@media (prefers-color-scheme:dark){.multi{color:#fdba74}}
