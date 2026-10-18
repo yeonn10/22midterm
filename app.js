@@ -6,7 +6,15 @@
   var subjects = DATA.subjects, byId = {}, qById = {}, order = new Map(), n = 0;
   subjects.forEach(function (s) { byId[s.id] = s; s.questions.forEach(function (q) { qById[q.id] = { q: q, s: s }; order.set(q.id, n++); }); });
   var validIds = new Set(order.keys());
-  var showHachi = false; // h 키로 하치와레 보이기/숨기기 (기본: 숨김)
+  /* 캐릭터: 키(영문/한글 자판 무관, 물리 키 기준)로 각각 켜고 끔. 기본은 모두 숨김 */
+  var MASCOTS = [['c', 'KeyC', 'ㅊ'], ['h', 'KeyH', 'ㅗ'], ['u', 'KeyU', 'ㅕ'], ['m', 'KeyM', 'ㅡ'], ['l', 'KeyL', 'ㅣ'], ['s', 'KeyS', 'ㄴ'], ['k', 'KeyK', 'ㅏ']];
+  var shownMascots = {};
+  function drawMascots(on) {
+    var box = document.getElementById('mascots'); if (!box) return;
+    box.innerHTML = on ? MASCOTS.filter(function (m) { return shownMascots[m[0]]; }).map(function (m) {
+      return '<img src="mascot-' + m[0] + '.png" alt="">';
+    }).join('') : '';
+  }
   var Q = null; // 진행 중 퀴즈 상태
   var view = 'home';
 
@@ -19,7 +27,7 @@
   function go(h) { if (location.hash === h) route(); else location.hash = h; }
   function route() {
     app.className = '';
-    var mc = document.getElementById('mascot'); if (mc) mc.hidden = true;
+    drawMascots(false);
     var h = location.hash || '#/';
     var m;
     if ((m = h.match(/^#\/s\/([^/]+)$/)) && byId[m[1]]) return setup(byId[m[1]]);
@@ -102,7 +110,7 @@
       '<div class="qtext">' + esc(q.q) + (multi && !/모두\s*고르/.test(q.q) ? ' <span class="multi">(모두 고르시오)</span>' : '') + (q.gen ? ' <span class="badge">보기 재구성</span>' : '') + '</div>';
     var hasFig = !!((q.figs && q.figs.length) || q.img);
     app.className = hasFig ? 'wide' : '';
-    var mc = document.getElementById('mascot'); if (mc) mc.hidden = !showHachi;
+    drawMascots(true);
     h += '<div class="qgrid' + (hasFig ? ' withfig' : '') + '">';
     if (q.figs && q.figs.length) h += '<div class="figcol"><div class="fig">' + q.figs.map(function (f) { return '<img src="' + esc(f) + '" alt="문제 그림">'; }).join('') + '</div></div>';
     else if (q.img) h += '<div class="figcol"><div class="fig" id="fig"></div></div>';
@@ -181,7 +189,10 @@
     var k = e.key, handled = true;
     if (k >= '1' && k <= '5') pick(+k);
     else if (k === '0') dontKnow();
-    else if (k === 'h' || k === 'H' || k === 'ㅗ' || e.code === 'KeyH') { showHachi = !showHachi; var mc2 = document.getElementById('mascot'); if (mc2) mc2.hidden = !showHachi; }
+    else if (MASCOTS.some(function (m) { return k.toLowerCase() === m[0] || k === m[2] || e.code === m[1]; })) {
+      var mm = MASCOTS.filter(function (m) { return k.toLowerCase() === m[0] || k === m[2] || e.code === m[1]; })[0];
+      shownMascots[mm[0]] = !shownMascots[mm[0]]; drawMascots(true);
+    }
     else if (k === 'b' || k === 'B' || k === 'ㅠ' || e.code === 'KeyB') toggleBm();   // 북마크 있으면 해제, 없으면 추가
     else if (k === 'Enter') { if (Q.ans[cur().id]) move(1); else if (Q.pend.length) submit(); }
     else if (k === 'ArrowRight' || k === 'ArrowDown') move(1);
