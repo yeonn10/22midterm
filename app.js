@@ -18,6 +18,7 @@
   function go(h) { if (location.hash === h) route(); else location.hash = h; }
   function route() {
     app.className = '';
+    var mc = document.getElementById('mascot'); if (mc) mc.hidden = true;
     var h = location.hash || '#/';
     var m;
     if ((m = h.match(/^#\/s\/([^/]+)$/)) && byId[m[1]]) return setup(byId[m[1]]);
@@ -100,6 +101,7 @@
       '<div class="qtext">' + esc(q.q) + (multi ? '  <span class="tag">모두 고르시오</span>' : '') + (q.gen ? ' <span class="badge">보기 재구성</span>' : '') + '</div>';
     var hasFig = !!((q.figs && q.figs.length) || q.img);
     app.className = hasFig ? 'wide' : '';
+    var mc = document.getElementById('mascot'); if (mc) mc.hidden = false;
     h += '<div class="qgrid' + (hasFig ? ' withfig' : '') + '">';
     if (q.figs && q.figs.length) h += '<div class="figcol"><div class="fig">' + q.figs.map(function (f) { return '<img src="' + esc(f) + '" alt="문제 그림">'; }).join('') + '</div></div>';
     else if (q.img) h += '<div class="figcol"><div class="fig" id="fig"></div></div>';

@@ -60,3 +60,9 @@ main.wide{max-width:1180px}
   .qgrid.withfig{display:block}
   .qgrid.withfig .fig img{max-height:45vh}
 }
+
+/* 퀴즈 화면 마스코트: 왼쪽 아래, 클릭은 통과, 카드 뒤에 깔림 */
+#mascot{position:fixed;left:10px;bottom:10px;width:clamp(70px,calc((100vw - 840px) / 2 - 14px),170px);height:auto;z-index:0;pointer-events:none;user-select:none}
+#mascot[hidden]{display:none}
+main,.top,header{position:relative;z-index:1}
+@media (max-width:640px){#mascot{display:none}}
