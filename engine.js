@@ -35,6 +35,7 @@
   /** 보기 순서가 의미를 갖는 문항(가·나·다, A·B·C, 연속 숫자, ①~⑤ 지칭, 해설이 번호를 언급)은 섞지 않는다 */
   function isFixedOrder(q) {
     var o = q.opts;
+    if (o.length === 2 && o.every(function (x) { return /^\s*(O|X|T|F)\s*(\(.*\))?\s*$/i.test(x); })) return true;   // O/X(참/거짓) 문항은 항상 O, X 순서
     if (o.every(function (x) { return LABEL_RE.test(x); })) return true;
     if (o.some(function (x) { return /[①-⑩]/.test(x); })) return true;
     var allNum = o.every(function (x) { return /\d/.test(x); });
