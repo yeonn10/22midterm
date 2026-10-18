@@ -181,7 +181,7 @@
     var k = e.key, handled = true;
     if (k >= '1' && k <= '5') pick(+k);
     else if (k === '0') dontKnow();
-    else if (k === 'h' || k === 'H') { showHachi = !showHachi; var mc2 = document.getElementById('mascot'); if (mc2) mc2.hidden = !showHachi; }
+    else if (k === 'h' || k === 'H' || k === 'ㅗ' || e.code === 'KeyH') { showHachi = !showHachi; var mc2 = document.getElementById('mascot'); if (mc2) mc2.hidden = !showHachi; }
     else if (k === '9') { if (store.has(cur().id)) toggleBm('del'); else toast('북마크에 없는 문제입니다'); }
     else if (k === '8') toggleBm('add');
     else if (k === 'Enter') { if (Q.ans[cur().id]) move(1); else if (Q.pend.length) submit(); }
