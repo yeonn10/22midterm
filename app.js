@@ -129,7 +129,7 @@
     h += '</div></div></div><div class="nav"><button id="prev"' + (Q.i ? '' : ' disabled') + '>← 이전</button>' +
       '<button id="dk"' + (done ? ' disabled' : '') + '>모름 (0)</button>' +
       '<button class="primary" id="next">' + (Q.i === Q.deck.length - 1 ? '결과 보기' : '다음 →') + '</button></div>' +
-      '<div class="keys"><kbd>1</kbd>–<kbd>5</kbd> 선택 · <kbd>0</kbd> 모름 · <kbd>→</kbd>/<kbd>↓</kbd> 다음(풀기 전에도 가능) · <kbd>Enter</kbd> 정답 확인 후 다음 · <kbd>←</kbd>/<kbd>↑</kbd> 이전 · <kbd>B</kbd> 북마크 추가/해제' + ' · 번호로 고른 뒤 <kbd>Enter</kbd>로 정답 확인'+(multi ? ' (복수정답은 번호로 여러 개 선택)' : '') + '</div>';
+      '<div class="keys"><kbd>1</kbd>–<kbd>5</kbd> 선택 · <kbd>0</kbd> 모름 · <kbd>Enter</kbd> 정답 확인 및 다음 · <kbd>→</kbd>/<kbd>↓</kbd> 다음 · <kbd>←</kbd>/<kbd>↑</kbd> 이전 · <kbd>B</kbd> 북마크 추가/해제</div>';
     app.innerHTML = h;
     if (q.img && !(q.figs && q.figs.length)) drawFig(q);
     app.querySelectorAll('.opt').forEach(function (b) { b.onclick = function () { b.blur(); pick(+b.dataset.o); }; });
