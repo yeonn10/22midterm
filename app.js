@@ -197,6 +197,7 @@
     var k = e.key, handled = true;
     if (k >= '1' && k <= '5') pick(+k);
     else if (k === '0') dontKnow();
+    else if (k === 'Backspace') { if (mascotOrder.length) { mascotOrder.pop(); drawMascots(true); } }   // 맨 위 캐릭터부터 하나씩 숨김
     else if (MASCOTS.some(function (m) { return k.toLowerCase() === m[0] || k === m[2] || e.code === m[1]; })) {
       var mm = MASCOTS.filter(function (m) { return k.toLowerCase() === m[0] || k === m[2] || e.code === m[1]; })[0];
       var at = mascotOrder.indexOf(mm[0]);
