@@ -201,7 +201,7 @@
       var mm = MASCOTS.filter(function (m) { return k.toLowerCase() === m[0] || k === m[2] || e.code === m[1]; })[0];
       var at = mascotOrder.indexOf(mm[0]);
       if (at >= 0) mascotOrder.splice(at, 1); else mascotOrder.push(mm[0]);
-      drawMascots(true); if (at < 0) shakeMascot(mm[0]);
+      drawMascots(true);
     }
     else if (k === 'b' || k === 'B' || k === 'ㅠ' || e.code === 'KeyB') toggleBm();   // 북마크 있으면 해제, 없으면 추가
     else if (k === 'Enter') { if (Q.ans[cur().id]) move(1); else if (Q.pend.length) submit(); }
