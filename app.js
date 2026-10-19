@@ -105,6 +105,9 @@
   }
 
   /* ---------- 퀴즈 ---------- */
+  /* 북마크 옵션(전 과목 공통, 새로고침 후에도 유지): 자동 저장(오답·모름 → 북마크) / 자동 해제(정답 → 북마크 해제). 기본 둘 다 꺼짐 */
+  function getOpts() { var o = store.getPrefs()._opts || {}; return { save: !!o.save, del: !!o.del }; }
+  function setOpt(k, v) { var p = store.getPrefs(); var o = p._opts || {}; o[k] = v; p._opts = o; store.setPrefs(p); }
   function cur() { return Q.deck[Q.i]; }
   function quiz() {
     view = 'quiz'; updCount();
@@ -137,7 +140,9 @@
     h += '</div></div></div><div class="nav"><button id="prev"' + (Q.i ? '' : ' disabled') + '>← 이전</button>' +
       '<button id="dk"' + (done ? ' disabled' : '') + '>모름 (0)</button>' +
       '<button class="primary" id="next">' + (Q.i === Q.deck.length - 1 ? '결과 보기' : '다음 →') + '</button></div>' +
-      '<div class="keys"><kbd>1</kbd>–<kbd>5</kbd> 선택 · <kbd>0</kbd> 모름 · <kbd>Enter</kbd> 정답 확인 및 다음 · <kbd>→</kbd>/<kbd>↓</kbd> 다음 · <kbd>←</kbd>/<kbd>↑</kbd> 이전 · <kbd>B</kbd> 북마크 추가/해제</div>';
+      '<div class="keys"><kbd>1</kbd>–<kbd>5</kbd> 선택 · <kbd>0</kbd> 모름 · <kbd>Enter</kbd> 정답 확인 및 다음 · <kbd>→</kbd>/<kbd>↓</kbd> 다음 · <kbd>←</kbd>/<kbd>↑</kbd> 이전 · <kbd>B</kbd> 북마크 추가/해제</div>' +
+      '<div class="bmopts"><label><input type="checkbox" id="optSave"' + (getOpts().save ? ' checked' : '') + '> 북마크 자동 저장 <small>(틀린 문제 자동 추가)</small></label>' +
+      '<label><input type="checkbox" id="optDel"' + (getOpts().del ? ' checked' : '') + '> 북마크 자동 해제 <small>(맞힌 문제 자동 해제)</small></label></div>';
     app.innerHTML = h;
     if (q.img && !(q.figs && q.figs.length)) drawFig(q);
     app.querySelectorAll('.opt').forEach(function (b) { b.onclick = function () { b.blur(); pick(+b.dataset.o); }; });
@@ -146,6 +151,8 @@
     document.getElementById('next').onclick = function (e) { e.target.blur(); move(1); };
     document.getElementById('dk').onclick = function (e) { e.target.blur(); dontKnow(); };
     document.getElementById('bm').onclick = function (e) { e.target.blur(); toggleBm(); };
+    document.getElementById('optSave').onchange = function (e) { setOpt('save', e.target.checked); e.target.blur(); };
+    document.getElementById('optDel').onchange = function (e) { setOpt('del', e.target.checked); e.target.blur(); };
   }
   function drawFig(q) {
     var box = document.getElementById('fig'), exts = ['png', 'jpg', 'jpeg', 'webp'], k = 0;
@@ -164,8 +171,9 @@
     var ok = !dk && E.isCorrect(q, sel);
     Q.ans[q.id] = { sel: sel.slice(), dk: !!dk, correct: ok };
     Q.pend = [];
-    if (!ok && store.add(q.id)) toast('★ 북마크에 자동 추가');
-    else if (ok && store.remove(q.id)) toast('정답! 북마크에서 자동 해제');
+    var op = getOpts();
+    if (!ok && op.save && store.add(q.id)) toast('★ 북마크에 자동 추가');
+    else if (ok && op.del && store.remove(q.id)) toast('정답! 북마크에서 자동 해제');
     quiz();
   }
   function pick(no) {
@@ -218,7 +226,7 @@
     var s = E.summarize(Q.deck, Q.ans);
     app.innerHTML = '<h1>결과</h1><div class="card"><div class="stat">' +
       '<div><b>' + s.correct + '</b>정답</div><div><b>' + s.wrong + '</b>오답</div><div><b>' + s.dk + '</b>모름</div><div><b>' + s.skipped + '</b>안 푼 문제</div></div>' +
-      '<p>' + s.total + '문항 중 ' + s.correct + '문항 정답 (' + Math.round(s.correct / s.total * 100) + '%). 오답·모름은 자동으로 북마크되었습니다.</p>' +
+      '<p>' + s.total + '문항 중 ' + s.correct + '문항 정답 (' + Math.round(s.correct / s.total * 100) + '%).' + (getOpts().save ? ' 오답·모름은 자동으로 북마크되었습니다.' : '') + '</p>' +
       '<div class="row"><button id="back">마지막 문제로</button><button id="retry"' + (s.wrongIds.length ? '' : ' disabled') + '>틀린/모름 다시 풀기 (' + s.wrongIds.length + ')</button>' +
       '<button id="setup">설정으로</button><button class="primary" id="home">처음으로</button></div></div>';
     document.getElementById('back').onclick = function () { go('#/quiz'); };
