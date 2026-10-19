@@ -69,3 +69,7 @@ main,.top,header{position:relative;z-index:1}
 
 .multi{font-weight:700;color:#c2410c;white-space:nowrap}
 @media (prefers-color-scheme:dark){.multi{color:#fdba74}}
+
+#mascots img{pointer-events:auto;cursor:pointer;transform-origin:50% 100%;-webkit-tap-highlight-color:transparent}
+#mascots img.shake{animation:mshake 1s ease-in-out}
+@keyframes mshake{0%,100%{transform:rotate(0)}10%{transform:rotate(-12deg)}20%{transform:rotate(11deg)}30%{transform:rotate(-10deg)}40%{transform:rotate(9deg)}50%{transform:rotate(-7deg)}60%{transform:rotate(6deg)}70%{transform:rotate(-4deg)}80%{transform:rotate(3deg)}90%{transform:rotate(-1deg)}}
