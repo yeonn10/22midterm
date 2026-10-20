@@ -249,7 +249,7 @@
     subjects.forEach(function (s) {
       var mine = known.filter(function (i) { return qById[i].s.id === s.id; });
       if (!mine.length) return;
-      h += '<div class="card"><div class="row"><h2 style="margin:0">' + esc(s.name) + ' (' + mine.length + ')</h2><span style="flex:1"></span><button class="primary" data-run="' + s.id + '">이 북마크만 풀기</button></div>' +
+      h += '<div class="card"><div class="row"><h2 style="margin:0">' + esc(s.name) + ' (' + mine.length + ')</h2><span style="flex:1"></span><button data-clrs="' + s.id + '">이 과목 전체 해제</button><button class="primary" data-run="' + s.id + '">이 북마크만 풀기</button></div>' +
         mine.map(function (i) {
           var q = qById[i].q;
           return '<div class="bmitem"><code>' + esc(i) + '</code><span>' + esc(q.q.replace(/\s+/g, ' ').slice(0, 90)) + '</span><button data-del="' + esc(i) + '">해제</button></div>';
@@ -258,6 +258,17 @@
     if (!known.length) h += '<p class="sub">북마크가 없습니다. 틀리거나 모름으로 체크한 문제는 자동으로 들어옵니다.</p>';
     app.innerHTML = h;
     app.querySelectorAll('[data-run]').forEach(function (b) { b.onclick = function () { var s = byId[b.dataset.run]; start(s, E.buildDeck(s, { onlyIds: store.list() }), '★ 북마크'); }; });
+    app.querySelectorAll('[data-clrs]').forEach(function (b) {
+      b.onclick = function () {
+        var sid = b.dataset.clrs, sj = byId[sid];
+        var mine = store.list().filter(function (i) { return qById[i] && qById[i].s.id === sid; });
+        if (!mine.length) return;
+        if (!confirm(sj.name + ' 북마크 ' + mine.length + '개를 모두 해제할까요?')) return;
+        var drop = {}; mine.forEach(function (i) { drop[i] = 1; });
+        store.replace(store.list().filter(function (i) { return !drop[i]; }));
+        bookmarks(); toast(sj.name + ' 북마크 ' + mine.length + '개 해제');
+      };
+    });
     app.querySelectorAll('[data-del]').forEach(function (b) { b.onclick = function () { store.remove(b.dataset.del); bookmarks(); }; });
     var ex = document.getElementById('exp'); if (ex) ex.onclick = exportTxt;
     document.getElementById('clr').onclick = function () { if (confirm('북마크를 모두 삭제할까요?')) { store.clear(); bookmarks(); } };
